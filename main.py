@@ -71,12 +71,11 @@ class EmailProcessor:
                     except OSError as e:
                         print(f"Erro ao renomear o arquivo (OSError): {e}")
                 else:
-                    unsaved = f"{unsaved}/{archive}"
-                    if self._file_manager().exist_directory(unsaved):
+                    unsaved_path = os.path.join(unsaved, archive)
+                    if os.path.exists(unsaved_path):
                         self._file_manager().remove_file(file_path)
-                    
-                    elif not self._file_manager().exist_directory(unsaved):
-                        self._file_manager().move_file(file_path, unsaved)
+                    else:
+                        self._file_manager().move_file(file_path, unsaved_path)
                 
             elif archive.endswith(".xml"):
                 print(archive)
@@ -84,8 +83,6 @@ class EmailProcessor:
         folder = 'INBOX.Seen'
         self._inbox.mark_email_as_read(uids)
         self._inbox.create_folder('INBOX', folder)
-        self._inbox.move_email(uids, folder)
-
 
 if __name__ == "__main__":
     process = EmailProcessor(IMAP_SERVER, EMAIL, SENHA)
