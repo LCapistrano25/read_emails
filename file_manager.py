@@ -20,9 +20,16 @@ class FileManager:
     def save_file(self, directory, filename) -> str:
         """Responsável por salvar arquivo numa pasta específica"""
         return os.path.join(directory, filename)
-    
+
     def move_file(self, origin: str, destination: str) -> None:
         """Responsável por mover arquivo para outro local"""
+        # Verifique se o diretório de destino existe
+        destination_dir = os.path.dirname(destination)  # Pega apenas o diretório de destino, sem o nome do arquivo
+        
+        if not os.path.exists(destination_dir):
+            os.makedirs(destination_dir)  # Cria o diretório se não existir
+        
+        # Mover o arquivo para o diretório de destino
         os.rename(origin, destination)
 
     def rename_file(self, old_name: str, new_name: str):
