@@ -23,13 +23,12 @@ class FileManager:
 
     def move_file(self, origin: str, destination: str) -> None:
         """Responsável por mover arquivo para outro local"""
-        # Verifique se o diretório de destino existe
-        destination_dir = os.path.dirname(destination)  # Pega apenas o diretório de destino, sem o nome do arquivo
-        
+        destination_dir = os.path.dirname(destination)
         if not os.path.exists(destination_dir):
-            os.makedirs(destination_dir)  # Cria o diretório se não existir
+            os.makedirs(destination_dir)
+
+        destination = os.path.join(destination_dir, os.path.basename(origin))
         
-        # Mover o arquivo para o diretório de destino
         os.rename(origin, destination)
 
     def rename_file(self, old_name: str, new_name: str):
