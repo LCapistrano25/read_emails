@@ -50,6 +50,7 @@ class EmailProcessor:
                 text = pdf.process_pdf()
                 word = pdf.word_search(PARAM_DATE, DATE)
 
+                print(word)
                 if word:
                     word = word.replace('/', '-').replace(':', '-')
                     word_list = word.split()[0]
