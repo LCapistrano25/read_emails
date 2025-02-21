@@ -5,7 +5,9 @@ from email_reader import EmailReader
 from pdf_processor import PdfProcessor
 from xml_processor import XmlProcessor
 from file_manager import FileManager
-from parameter_words import DATE, PARAM_DATE, FINAL_FOLDER, UNSAVED, TEMPORARY_FOLDER, MONTH
+from utils import generate_file_hash
+
+from parameter_words import DATE, PARAM_DATE, FINAL_FOLDER, UNSAVED, TEMPORARY_FOLDER, MONTH, SEEN, BOX
 
 IMAP_SERVER = config("IMAP_SERVER")
 EMAIL = config("EMAIL")
@@ -50,11 +52,6 @@ class EmailProcessor:
                 text = pdf.process_pdf()
                 word = pdf.word_search(PARAM_DATE, DATE)
 
-                print(f"\n")
-                print(file_path)
-                print(text)
-                print(f"\n")
-
                 if word:
                     word = word.replace('/', '-').replace(':', '-')
                     word_list = word.split()[0]
@@ -63,8 +60,9 @@ class EmailProcessor:
                     
                     destinatary = f"{final}/{word_list_reversed[0]}/{MONTH[word_list_reversed[1]]}/{word_list_reversed[2]}/" 
 
+                    hash_name = generate_file_hash(archive)
                     directory = self._file_manager().create_directory(destinatary)
-                    new_file_path = self._file_manager().save_file(directory, f"{word}.pdf")
+                    new_file_path = self._file_manager().save_file(directory, f"{word} - {hash_name}.pdf")
 
                     try:
                         if not self._file_manager().exist_directory(new_file_path):
@@ -85,9 +83,11 @@ class EmailProcessor:
             elif archive.endswith(".xml"):
                 print(archive)
 
-        folder = 'INBOX.Seen'
+        folder = SEEN
         self._inbox.mark_email_as_read(uids)
-        self._inbox.create_folder('INBOX', folder)
+        self._inbox.create_folder(BOX, folder)
+        self._inbox.move_email(uids, folder)
+
 
 if __name__ == "__main__":
     process = EmailProcessor(IMAP_SERVER, EMAIL, SENHA)

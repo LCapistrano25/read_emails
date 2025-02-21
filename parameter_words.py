@@ -10,6 +10,9 @@ UNSAVED = config('UNSAVED')
 
 FILE_TYPE = "application/pdf"
 
+BOX = config('BOX')
+SEEN = config('SEEN')
+
 MONTH = {
     1: 'Janeiro',
     2: 'Fevereiro',
