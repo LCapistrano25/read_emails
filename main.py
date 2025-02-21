@@ -51,7 +51,7 @@ class EmailProcessor:
                 pdf = self._pdf_processor(file_path)
                 text = pdf.process_pdf()
                 word = pdf.word_search(PARAM_DATE, DATE)
-
+                print(word)
                 if word:
                     word = word.replace('/', '-').replace(':', '-')
                     word_list = word.split()[0]
@@ -74,12 +74,14 @@ class EmailProcessor:
                     except OSError as e:
                         print(f"Erro ao renomear o arquivo (OSError): {e}")
                 else:
+                    with open(f"{archive}.txt", "w") as f:
+                        f.write(f"{text}.txt")
                     unsaved_path = os.path.join(unsaved, archive)
                     if os.path.exists(unsaved_path):
                         self._file_manager().remove_file(file_path)
                     else:
                         self._file_manager().move_file(file_path, unsaved_path)
-                
+                    
             elif archive.endswith(".xml"):
                 print(archive)
 

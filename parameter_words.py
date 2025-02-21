@@ -1,8 +1,8 @@
 from decouple import config
 
-DATE = r"\d{2}/\d{2}/\d{4} \d{2}:\d{2}:\d{2}"
+DATE = r"\d{2}/\d{2}/\d{4} \d{2}:\d{2}:\d{2}|\d{2}/\d{2}/\d{4}"
 
-PARAM_DATE = ["emissao", "emisso", "emissdo"]
+PARAM_DATE = ["emissao", "emisso", "emissdo", "emiss&o", "emissão", "EMISSÃO:"]
 
 TEMPORARY_FOLDER = config('TEMPORARY_FOLDER')
 FINAL_FOLDER = config('FINAL_FOLDER')
