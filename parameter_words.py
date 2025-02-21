@@ -1,13 +1,14 @@
+from decouple import config
+
 DATE = r"\d{2}/\d{2}/\d{4} \d{2}:\d{2}:\d{2}"
 
 PARAM_DATE = ["emissao", "emisso"]
 
-TEMPORARY_FOLDER = "temporary/"
-FINAL_FOLDER = "nfs/"
-UNSAVED = "unsaved/"
+TEMPORARY_FOLDER = config('TEMPORARY_FOLDER')
+FINAL_FOLDER = config('FINAL_FOLDER')
+UNSAVED = config('UNSAVED')
 
 FILE_TYPE = "application/pdf"
-
 
 MONTH = {
     1: 'Janeiro',

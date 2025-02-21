@@ -35,6 +35,10 @@ class EmailProcessor:
 
     def process_files(self, temp, unsaved, final):
         """Responsável por salvar"""
+        self._file_manager().create_directory(temp)
+        self._file_manager().create_directory(unsaved)
+        self._file_manager().create_directory(final)
+        
         inbox = self.search_for_emails()
         uids = self.extract_files(inbox, temp)
         
