@@ -53,6 +53,12 @@ class PdfProcessor:
             self.text_content = self.extract_text_with_ocr()
         return self.text_content
 
+    def remove_space(self, text: str) -> str:
+        """Remove o espaço num texto"""
+        if text:
+            return re.sub(r'\s+', '', text).strip()
+        return None
+
     def _convert_text_to_list(self) -> list:
         """Transforma o texto em lista"""
         return self.text_content.split("\n")
@@ -66,12 +72,14 @@ class PdfProcessor:
         print(text_list)
         for text in text_list:
             if found:
-                word = re.search(f"{word_search}", text)
+                word = re.search(word_search, text)
                 if word:
                     return word.group()
             if re.search(f"{words}", unidecode(text.lower())):
                 found = True
-                word = re.search(f"{word_search}", text)
+                word = re.search(word_search, text)
                 if word:
                     return word.group()
         return None
+
+    

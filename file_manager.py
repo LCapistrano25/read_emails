@@ -32,3 +32,18 @@ class FileManager:
     def remove_file(self, directory):
         """Responsável por deletar um arquivo"""
         os.remove(directory)
+
+    def extract_extension(self, filename) -> str:
+        """Responsável por retornar a extensão de um arquivo"""
+        return os.path.splitext(filename)[1]
+    
+    def create_path_to_folder(self, *args: str) -> str:
+        """Responsável por criar caminhos para pastas"""
+        return self.normalize_path("/".join(map(str, args)))
+    
+    def normalize_path(self, path) -> str:
+        """Responsável por normalizar o caminho do arquivo"""
+        return os.path.normpath(path)
+
+
+
