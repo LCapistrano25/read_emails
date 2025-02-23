@@ -68,6 +68,13 @@ class EmailProcessor:
         else:
             self._file_manager().move_file(temp_file_path, unsaved_path)
 
+    def clean_temporary_folder(self, general_temporary_folder: str) -> None:
+        """Responsável por limpar a pasta temporária"""
+        for archive in os.listdir(general_temporary_folder):    
+            path = self._file_manager().create_path_to_folder(general_temporary_folder, archive)
+            if not self._file_manager().exist_directory(path):
+                self._file_manager().remove_file(path)
+
     def process_pdf(self, archive, standart_folder: str, general_temp_folder: str, unsaved_folder: str, final_folder: str):
         """Responsável por identificar os padrões nos pdfs e destinar ao local correto"""
         file_path = self._file_manager().create_path_to_folder(general_temp_folder, archive)
@@ -139,6 +146,7 @@ class EmailProcessor:
         self._inbox.mark_email_as_read(uids)
         self._inbox.create_folder(BOX, folder)
         self._inbox.move_email(uids, folder)
+        self.clean_temporary_folder(general_temporary_folder)
 
 if __name__ == "__main__":
     process = EmailProcessor(IMAP_SERVER, EMAIL, SENHA)
