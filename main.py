@@ -1,5 +1,6 @@
 # Bibliotecas padrão
 import os
+import time
 
 # Bibliotecas de terceiros
 from decouple import config
@@ -10,6 +11,7 @@ from email_reader import EmailReader
 from pdf_processor import PdfProcessor
 from xml_processor import XmlProcessor
 from file_manager import FileManager
+from control_log import ControlLog
 from utils import generate_file_hash, turn_date_into_list
 
 # Constantes e parâmetros de configuração
@@ -29,6 +31,7 @@ class EmailProcessor:
         self._file_manager = FileManager
         self._pdf_processor = PdfProcessor
         self._xml_processor = XmlProcessor
+        self._control_log = ControlLog
 
     def search_for_emails(self, criteria="ALL"):
         """Responsável pela consulta na caixa de email"""
@@ -48,7 +51,8 @@ class EmailProcessor:
         """Responsável por criar os diretórios principais"""
         new_temp_standart = self._file_manager().create_path_to_folder(standart, temp)
         self._file_manager().create_directory(new_temp_standart)
-
+        self._file_manager().make_folder_hidden(new_temp_standart)
+        
         new_unsaved_standart = self._file_manager().create_path_to_folder(standart, unsaved)
         self._file_manager().create_directory(new_unsaved_standart)
 
@@ -72,32 +76,34 @@ class EmailProcessor:
         """Responsável por limpar a pasta temporária"""
         for archive in os.listdir(general_temporary_folder):    
             path = self._file_manager().create_path_to_folder(general_temporary_folder, archive)
-            if not self._file_manager().exist_directory(path):
+            if self._file_manager().exist_directory(path):
                 self._file_manager().remove_file(path)
 
-    def process_pdf(self, archive, standart_folder: str, general_temp_folder: str, unsaved_folder: str, final_folder: str):
+    def process_pdf(self, archive, standart_folder: str, general_temp: str, unsaved_folder: str, final_folder: str):
         """Responsável por identificar os padrões nos pdfs e destinar ao local correto"""
-        file_path = self._file_manager().create_path_to_folder(general_temp_folder, archive)
+        file_path = self._file_manager().create_path_to_folder(general_temp, archive)
         pdf = self._pdf_processor(file_path)
         text = pdf.process_pdf()
 
         general_unsaved_folder = self._file_manager().create_path_to_folder(standart_folder, unsaved_folder)
 
-        identifier_company = (pdf.word_search(PARAM_CNPJ, CNPJ))
+        identifier_company = pdf.word_search(PARAM_CNPJ, CNPJ)
         identifier_company = pdf.remove_space(identifier_company)
 
+        self._control_log().log_info(archive)
         if identifier_company:
-            # Encontrou filial
-            folder = BRANCHES.get(identifier_company, None) # Busca o nome da pasta
+            folder = BRANCHES.get(identifier_company, None)
             if folder:
-                date = pdf.word_search(PARAM_DATE, DATE) 
+                self._control_log().log_info(f"Filial identificada -> {folder}")
                 branch_unsaved_folder = self._file_manager().create_path_to_folder(
                         standart_folder, folder, unsaved_folder)   
-                # Encontrou o nome da pasta
+
+                date = pdf.word_search(PARAM_DATE, DATE) 
                 if date:
                     date = date.replace('/', '-').replace(':', '-')
                     date_list_reversed = turn_date_into_list(date)
                     
+                    self._control_log().log_info(f"Data de emissão encontrada -> {date}")
                     destinatary = self._file_manager().create_path_to_folder(
                         standart_folder, folder, final_folder, 
                         date_list_reversed[0], 
@@ -105,27 +111,35 @@ class EmailProcessor:
                         date_list_reversed[2]
                     )
 
+                    self._control_log().log_info(f"Destino da Nota Identificado -> {destinatary}")
+
                     hash_name = generate_file_hash(archive)
                     directory = self._file_manager().create_directory(destinatary)
-                    new_file_path = self._file_manager().save_file(directory, f"{date} - {hash_name}.pdf")
+                    new_filename = f"{date} - {hash_name}.pdf"
+                    new_file_path = self._file_manager().save_file(directory, new_filename)
 
                     try:
                         if not self._file_manager().exist_directory(new_file_path):
+                            self._control_log().log_info(f"Movendo arquivo para novo diretório -> {new_file_path}\n")
                             self._file_manager().move_file(file_path, new_file_path)
                         else:
+                            self._control_log().log_info(f"Excluíndo arquivo, pois já existe no diretório -> {new_filename}\n")
                             self._file_manager().remove_file(file_path)
                     except PermissionError as e:
-                        print(f"Erro ao renomear o arquivo: {e}")
+                        self._control_log().log_error(f"Erro ao renomear o arquivo: {e}\n")
                     except OSError as e:
-                        print(f"Erro ao renomear o arquivo (OSError): {e}")
+                        self._control_log().log_error(f"Erro ao renomear o arquivo (OSError): {e}\n")
                 else:
-                    # Manda para pasta de INDEFINIDOS DA FILIAL
+                    self._control_log().log_warning(f"Data de emissão não encontrada")
+                    self._control_log().log_warning(f"Movendo para pasta de indefinidos de {folder}\n")
                     self.redirect_unassigned_files(file_path, branch_unsaved_folder, archive)
             else:
-                # Manda para pasta de INDEFINIDOS GERAL
+                self._control_log().log_warning(f"Filial não encontrada")
+                self._control_log().log_warning(f"Movendo para pasta de indefinidos gerais.\n")
                 self.redirect_unassigned_files(file_path, general_unsaved_folder, archive)
         else:
-            # Manda para pasra de INDEFINIDOS GERAL
+            self._control_log().log_warning(f"Filial não encontrada")
+            self._control_log().log_warning(f"Movendo para pasta de indefinidos gerais.\n")
             self.redirect_unassigned_files(file_path, general_unsaved_folder, archive)
 
     def process_files(self, folders: dict, standart: str, temp: str, unsaved: str, final: str):
@@ -146,6 +160,8 @@ class EmailProcessor:
         self._inbox.mark_email_as_read(uids)
         self._inbox.create_folder(BOX, folder)
         self._inbox.move_email(uids, folder)
+
+        time.sleep(10)
         self.clean_temporary_folder(general_temporary_folder)
 
 if __name__ == "__main__":

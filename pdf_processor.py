@@ -67,9 +67,8 @@ class PdfProcessor:
         """Buscar um dado específico numa lista de palavras"""
         words = params
         text_list = self._convert_text_to_list()
-        text_list = [item for item in text_list if item and item.strip()]
+        text_list = [item.replace('\xa0', '') for item in text_list if item and item.strip()]
         found = False
-        print(text_list)
         for text in text_list:
             if found:
                 word = re.search(word_search, text)

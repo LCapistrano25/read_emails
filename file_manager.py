@@ -1,4 +1,5 @@
 import os
+import subprocess
 
 class FileManager:
     """Responsável por lidar com a criação de pastas, mover arquivos e renomea-los"""
@@ -44,6 +45,11 @@ class FileManager:
     def normalize_path(self, path) -> str:
         """Responsável por normalizar o caminho do arquivo"""
         return os.path.normpath(path)
+    
+    def make_folder_hidden(self, path: str) -> None:
+        """Método responsável por tornar pasta oculta"""
+        subprocess.run(["attrib", "+H", path])
+
 
 
 

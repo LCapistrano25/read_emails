@@ -2,7 +2,7 @@ from decouple import config
 
 # 📅 Expressões Regulares para Data
 DATE = r"\d{2}/\d{2}/\d{4} \d{2}:\d{2}:\d{2}|\d{2}/\d{2}/\d{4}"
-PARAM_DATE = r"(emiss?[\w&]+|emissão|emiss[oó]o|emiss&o|emissão|emiss3o|emissio)"
+PARAM_DATE = r"(emiss?[\w&]+|emissão|emiss[oó]o|emiss&o|emissão|emiss3o|emissio|data\s*de\s*geração\s*da\s*nfs-e)"
 
 CNPJ = r"30\.698\.208\s*/?\s*0001\s*-\s*97|" \
         r"30\.698\.208\s*/?\s*0002\s*-\s*78|" \
