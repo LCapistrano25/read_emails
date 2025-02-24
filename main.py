@@ -51,7 +51,6 @@ class EmailProcessor:
         """Responsável por criar os diretórios principais"""
         new_temp_standart = self._file_manager().create_path_to_folder(standart, temp)
         self._file_manager().create_directory(new_temp_standart)
-        self._file_manager().make_folder_hidden(new_temp_standart)
         
         new_unsaved_standart = self._file_manager().create_path_to_folder(standart, unsaved)
         self._file_manager().create_directory(new_unsaved_standart)
