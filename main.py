@@ -3,7 +3,6 @@ import os
 import time
 
 # Bibliotecas de terceiros
-from decouple import config
 
 # Módulos internos de conexão e processamento de dados
 from connection import Connection
@@ -20,9 +19,7 @@ from parameter_words import (
     STANDART_FOLDER, PARAM_CNPJ, CNPJ
 )
 
-IMAP_SERVER = config("IMAP_SERVER")
-EMAIL = config("EMAIL")
-SENHA = config("SENHA")
+from config import IMAP_SERVER, EMAIL, SENHA
 
 class EmailProcessor:
     def __init__(self, imap, email, password, folder="INBOX"):

@@ -1,4 +1,11 @@
-from decouple import config
+from config import (
+    STANDART_FOLDER,
+    TEMPORARY_FOLDER,
+    FINAL_FOLDER,
+    UNSAVED,
+    BOX,
+    SEEN,
+)
 
 # 📅 Expressões Regulares para Data
 DATE = r"\d{2}/\d{2}/\d{4} \d{2}:\d{2}:\d{2}|\d{2}/\d{2}/\d{4}"
@@ -10,17 +17,12 @@ PARAM_CNPJ = r"cnpj\s*"
 
 
 # 📂 Configurações de Diretórios
-STANDART_FOLDER = config('STANDART_FOLDER')
-TEMPORARY_FOLDER = config('TEMPORARY_FOLDER')
-FINAL_FOLDER = config('FINAL_FOLDER')
-UNSAVED = config('UNSAVED')
 
 # 📄 Tipo de Arquivo
 FILE_TYPE = "application/pdf"
 
 # 📬 Configuração da Caixa de Email
-BOX = config('BOX')
-SEEN = config('SEEN')
+ 
 
 # 📆 Meses do Ano
 MONTH = {
